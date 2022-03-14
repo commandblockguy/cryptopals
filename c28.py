@@ -40,12 +40,17 @@ def sha1(msg):
 			a, b, c, d, e = (leftrotate(a, 5) + f + e + k + words[i]) & 0xffffffff, a, leftrotate(b, 30), c, d
 			# print('t={:2}: {:08X}  {:08X}  {:08X}  {:08X}  {:08X}'.format(i, a, b, c, d, e))
 		h = tuple((x + y) & 0xffffffff for (x, y) in zip(h, (a, b, c, d, e)))
-	return Bits().join(Bits(uintbe=x, length=32) for x in h).hex
+	return Bits().join(Bits(uintbe=x, length=32) for x in h).bytes
 
 key = b'secret'
-message = b'words'
 
 def auth(message):
 	return sha1(key + message)
 
-print(auth(message))
+def check_auth(message, signature):
+	return sha1(key + message) == signature
+
+message = b'testing something'
+a = auth(message)
+print(a)
+print(check_auth(message, a))
